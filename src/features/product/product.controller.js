@@ -21,9 +21,9 @@ export default class ProductController {
   async addProduct(req, res) {
     try{
       console.log(req.body);
-    const { name, price, sizes, desc } = req.body;
+    const { name, price, sizes, desc, category } = req.body;
     const newProduct = new ProductModel(name,null, parseFloat(price),
-    req.file.filename,null, sizes.split(',')
+    req?.file?.filename, category, sizes?.split(',')
     );
     const createdProduct = await this.productRepository.add(newProduct);
     res.status(201).send(createdProduct);
@@ -35,24 +35,25 @@ export default class ProductController {
 
   async rateProduct(req, res, next) {    
     try{
-    const userID = req.userID;
-    const productID = req.body.productID;
-    const rating = req.body.rating;
-    await this.productRepository.rate(
-      userID,
-      productID,
-      rating
-    );
-    return res
-      .status(200)
-      .send('Rating has been added');
-  
+      const userID = req.userID;
+      const {productId, rating, comment} = req.body;
+      
+      await this.productRepository.rate(
+        userID,
+        productId,
+        rating,
+        comment
+      );
+      return res
+        .status(200)
+        .send('Rating has been added');
+    
     }catch(err){
-      console.log(err);
-      console.log("Passing error to middleware");
-      next(err);
+        console.log(err);
+        console.log("Passing error to middleware");
+        next(err);
     }
-    }
+  }
 
   async getOneProduct(req, res) {
     try{

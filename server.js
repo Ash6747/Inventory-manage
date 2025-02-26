@@ -3,6 +3,7 @@ import express from 'express';
 import swagger from 'swagger-ui-express';
 import dotenv from "dotenv";
 
+import mongoose from 'mongoose';
 import productRouter from './src/features/product/product.routes.js';
 import userRouter from './src/features/user/user.routes.js';
 import jwtAuth from './src/middlewares/jwt.middleware.js';
@@ -66,7 +67,12 @@ server.get('/', (req, res) => {
 
 // Error handler middleware
 server.use((err, req, res, next) => {
+  
   console.log(err);
+
+  if (err instanceof mongoose.Error.ValidationError) {
+    return res.status(err.code).send(err.message);
+  }
   if (err instanceof ApplicationError) {
     return res.status(err.code).send(err.message);
   }
